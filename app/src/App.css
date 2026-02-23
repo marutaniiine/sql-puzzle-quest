@@ -110,16 +110,13 @@ body {
 .main {
   flex: 1;
   padding: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  width: 100%;
 }
 
 .puzzle-card {
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  max-width: 1200px;
   width: 100%;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
