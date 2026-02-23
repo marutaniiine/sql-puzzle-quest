@@ -122,7 +122,7 @@ export const puzzles: Puzzle[] = [
       (5, 'セレナ', 7, '魔法使い'),
       (6, 'レオ', 6, '戦士');
     `,
-    question: 'クラスごとの平均レベルを取得せよ（クラス名と平均レベルを表示）',
+    question: 'クラスごとの平均レベルを取得せよ（クラス名と平均レベル(avg_levelとする)を表示）',
     expectedResult: [
       { class: '僧侶', avg_level: 10 },
       { class: '戦士', avg_level: 5.5 },

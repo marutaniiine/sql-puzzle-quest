@@ -19,6 +19,7 @@ function App() {
   const [showHint, setShowHint] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
   const [tableData, setTableData] = useState<Record<string, any[]>>({});
 
   const currentPuzzle = puzzles[gameState.currentPuzzle];
@@ -80,6 +81,7 @@ function App() {
       setShowHint(false);
       setShowExplanation(false);
       setShowSuccess(false);
+      setShowAnswer(false);
     });
   }, [sqlReady, gameState.currentPuzzle]);
 
@@ -296,6 +298,9 @@ function App() {
               <button className="btn btn-secondary" onClick={toggleHint}>
                 {showHint ? '💡 ヒントを隠す' : '💡 ヒントを見る'}
               </button>
+              <button className="btn btn-answer" onClick={() => setShowAnswer(!showAnswer)}>
+                {showAnswer ? '📖 答えを隠す' : '📖 答えを見る'}
+              </button>
             </div>
           </div>
 
@@ -303,6 +308,13 @@ function App() {
             <div className="hint-box">
               <h4>💡 ヒント</h4>
               <p>{currentPuzzle.hint}</p>
+            </div>
+          )}
+
+          {showAnswer && (
+            <div className="answer-box">
+              <h4>📖 模範解答</h4>
+              <code>{currentPuzzle.explanation}</code>
             </div>
           )}
 
