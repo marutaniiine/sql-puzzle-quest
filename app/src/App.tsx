@@ -19,24 +19,34 @@ function App() {
   const [showHint, setShowHint] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [tableData, setTableData] = useState<Record<string, any[]>>({});
 
   const currentPuzzle = puzzles[gameState.currentPuzzle];
 
   // Initialize SQL.js
   useEffect(() => {
+    const wasmUrl = `${import.meta.env.BASE_URL}sql-wasm.wasm`;
+    console.log('Loading wasm from:', wasmUrl);
     initSqlJs({
-      locateFile: (file) => `https://sql.js.org/dist/${file}`,
-    }).then(() => {
-      setSqlReady(true);
-    });
+      locateFile: () => wasmUrl,
+    })
+      .then(() => {
+        console.log('SQL.js loaded successfully');
+        setSqlReady(true);
+      })
+      .catch((err) => {
+        console.error('SQL.js initialization error:', err);
+        setError('SQLエンジンの読み込みに失敗しました。ページをリロードしてください。');
+      });
   }, []);
 
   // Initialize database when puzzle changes
   useEffect(() => {
     if (!sqlReady || !currentPuzzle) return;
 
+    const wasmUrl = `${import.meta.env.BASE_URL}sql-wasm.wasm`;
     initSqlJs({
-      locateFile: (file) => `https://sql.js.org/dist/${file}`,
+      locateFile: () => wasmUrl,
     }).then((SQL) => {
       const database = new SQL.Database();
 
@@ -50,6 +60,19 @@ function App() {
 
       // Insert initial data
       database.run(currentPuzzle.initialData);
+
+      // Fetch table data for preview
+      const data: Record<string, any[]> = {};
+      currentPuzzle.tableSchema.forEach((table) => {
+        const stmt = database.prepare(`SELECT * FROM ${table.name}`);
+        const rows: any[] = [];
+        while (stmt.step()) {
+          rows.push(stmt.getAsObject());
+        }
+        stmt.free();
+        data[table.name] = rows;
+      });
+      setTableData(data);
 
       setDb(database);
       setResult(null);
@@ -209,26 +232,45 @@ function App() {
           </div>
 
           <div className="schema-section">
-            <h3>📊 テーブル構造</h3>
+            <h3>📊 テーブルデータ</h3>
             {currentPuzzle.tableSchema.map((table) => (
               <div key={table.name} className="table-schema">
                 <h4>{table.name}</h4>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>カラム名</th>
-                      <th>型</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.columns.map((col) => (
-                      <tr key={col.name}>
-                        <td>{col.name}</td>
-                        <td>{col.type}</td>
+                {tableData[table.name] && tableData[table.name].length > 0 ? (
+                  <div className="table-container">
+                    <table>
+                      <thead>
+                        <tr>
+                          {table.columns.map((col) => (
+                            <th key={col.name}>
+                              {col.name}
+                              <span className="col-type">{col.type}</span>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tableData[table.name].map((row, i) => (
+                          <tr key={i}>
+                            {table.columns.map((col) => (
+                              <td key={col.name}>{row[col.name]}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <table>
+                    <thead>
+                      <tr>
+                        {table.columns.map((col) => (
+                          <th key={col.name}>{col.name} <span className="col-type">{col.type}</span></th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                  </table>
+                )}
               </div>
             ))}
           </div>

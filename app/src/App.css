@@ -119,7 +119,7 @@ body {
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  max-width: 900px;
+  max-width: 1200px;
   width: 100%;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -214,6 +214,13 @@ body {
   color: #1e293b;
   font-size: 1rem;
   font-weight: 500;
+}
+
+.col-type {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 /* Question Section */
